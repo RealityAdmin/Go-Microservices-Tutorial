@@ -1,8 +1,10 @@
 package memory
 
 import (
+	"context"
 	"sync"
 
+	"movieexamplekhubaib.com/metadata/internal/repository"
 	"movieexamplekhubaib.com/metadata/pkg/model"
 )
 
@@ -13,4 +15,22 @@ type Repository struct {
 
 func New() *Repository {
 	return &Repository{data: map[string]*model.Metadata{}}
+}
+
+// _ for context argument tells compiler that it's needed but not used
+func (r *Repository) Get(_ context.Context, id string) (*model.Metadata, error) {
+	r.RLock()
+	defer r.RUnlock()
+	m, ok := r.data[id]
+	if !ok {
+		return nil, repository.ErrNotFound
+	}
+	return m, nil
+}
+
+func (r *Repository) Put(_ context.Context, id string, metadata *model.Metadata) error {
+	r.Lock()
+	defer r.Unlock()
+	r.data[id] = metadata
+	return nil
 }
