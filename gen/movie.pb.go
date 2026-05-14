@@ -91,7 +91,7 @@ func (x *Metadata) GetDirector() string {
 
 type MovieDetails struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Rating        float32                `protobuf:"fixed32,1,opt,name=rating,proto3" json:"rating,omitempty"`
+	Rating        float64                `protobuf:"fixed64,1,opt,name=rating,proto3" json:"rating,omitempty"`
 	Metadata      *Metadata              `protobuf:"bytes,2,opt,name=metadata,proto3" json:"metadata,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -127,7 +127,7 @@ func (*MovieDetails) Descriptor() ([]byte, []int) {
 	return file_movie_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *MovieDetails) GetRating() float32 {
+func (x *MovieDetails) GetRating() float64 {
 	if x != nil {
 		return x.Rating
 	}
@@ -312,7 +312,7 @@ func (*PutMetadataResponse) Descriptor() ([]byte, []int) {
 type GetAggregatedRatingRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	RecordId      string                 `protobuf:"bytes,1,opt,name=record_id,json=recordId,proto3" json:"record_id,omitempty"`
-	RecordType    int32                  `protobuf:"varint,2,opt,name=record_type,json=recordType,proto3" json:"record_type,omitempty"`
+	RecordType    string                 `protobuf:"bytes,2,opt,name=record_type,json=recordType,proto3" json:"record_type,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -354,11 +354,11 @@ func (x *GetAggregatedRatingRequest) GetRecordId() string {
 	return ""
 }
 
-func (x *GetAggregatedRatingRequest) GetRecordType() int32 {
+func (x *GetAggregatedRatingRequest) GetRecordType() string {
 	if x != nil {
 		return x.RecordType
 	}
-	return 0
+	return ""
 }
 
 type GetAggregatedRatingResponse struct {
@@ -409,7 +409,7 @@ type PutRatingRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	RecordId      string                 `protobuf:"bytes,2,opt,name=record_id,json=recordId,proto3" json:"record_id,omitempty"`
-	RecordType    int32                  `protobuf:"varint,3,opt,name=record_type,json=recordType,proto3" json:"record_type,omitempty"`
+	RecordType    string                 `protobuf:"bytes,3,opt,name=record_type,json=recordType,proto3" json:"record_type,omitempty"`
 	RatingValue   int32                  `protobuf:"varint,4,opt,name=rating_value,json=ratingValue,proto3" json:"rating_value,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -459,11 +459,11 @@ func (x *PutRatingRequest) GetRecordId() string {
 	return ""
 }
 
-func (x *PutRatingRequest) GetRecordType() int32 {
+func (x *PutRatingRequest) GetRecordType() string {
 	if x != nil {
 		return x.RecordType
 	}
-	return 0
+	return ""
 }
 
 func (x *PutRatingRequest) GetRatingValue() int32 {
@@ -608,7 +608,7 @@ const file_movie_proto_rawDesc = "" +
 	"\vdescription\x18\x03 \x01(\tR\vdescription\x12\x1a\n" +
 	"\bdirector\x18\x04 \x01(\tR\bdirector\"M\n" +
 	"\fMovieDetails\x12\x16\n" +
-	"\x06rating\x18\x01 \x01(\x02R\x06rating\x12%\n" +
+	"\x06rating\x18\x01 \x01(\x01R\x06rating\x12%\n" +
 	"\bmetadata\x18\x02 \x01(\v2\t.MetadataR\bmetadata\"/\n" +
 	"\x12GetMetadataRequest\x12\x19\n" +
 	"\bmovie_id\x18\x01 \x01(\tR\amovieId\"<\n" +
@@ -619,14 +619,14 @@ const file_movie_proto_rawDesc = "" +
 	"\x13PutMetadataResponse\"Z\n" +
 	"\x1aGetAggregatedRatingRequest\x12\x1b\n" +
 	"\trecord_id\x18\x01 \x01(\tR\brecordId\x12\x1f\n" +
-	"\vrecord_type\x18\x02 \x01(\x05R\n" +
+	"\vrecord_type\x18\x02 \x01(\tR\n" +
 	"recordType\"@\n" +
 	"\x1bGetAggregatedRatingResponse\x12!\n" +
 	"\frating_value\x18\x01 \x01(\x01R\vratingValue\"\x8c\x01\n" +
 	"\x10PutRatingRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x1b\n" +
 	"\trecord_id\x18\x02 \x01(\tR\brecordId\x12\x1f\n" +
-	"\vrecord_type\x18\x03 \x01(\x05R\n" +
+	"\vrecord_type\x18\x03 \x01(\tR\n" +
 	"recordType\x12!\n" +
 	"\frating_value\x18\x04 \x01(\x05R\vratingValue\"\x13\n" +
 	"\x11PutRatingResponse\"3\n" +

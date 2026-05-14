@@ -5,28 +5,23 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"net/http"
+	"net"
 	"time"
 
+	"movieexamplekhubaib.com/gen"
 	"movieexamplekhubaib.com/metadata/internal/controller/metadata"
 	"movieexamplekhubaib.com/metadata/internal/repository/memory"
 	"movieexamplekhubaib.com/pkg/discovery"
 	"movieexamplekhubaib.com/pkg/discovery/consul"
 
-	httphandler "movieexamplekhubaib.com/metadata/internal/handler/http"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
+	grpchandler "movieexamplekhubaib.com/metadata/internal/handler/grpc"
 )
 
 const serviceName = "metadata"
 
 func main() {
-	// log.Println("Starting movie metadata service")
-	// repo := memory.New()
-	// ctrl := metadata.New(repo)
-	// h := httphandler.New(ctrl)
-	// http.Handle("/metadata", http.HandlerFunc(h.GetMetadata))
-	// if err := http.ListenAndServe(":8081", nil); err != nil {
-	// 	panic(err)
-	// }
 
 	var port int
 	flag.IntVar(&port, "port", 8081, "API handler port")
@@ -58,9 +53,21 @@ func main() {
 
 	repo := memory.New()
 	svc := metadata.New(repo)
-	h := httphandler.New(svc)
-	http.Handle("/metadata", http.HandlerFunc(h.GetMetadata))
-	if err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil); err != nil {
+	// h := httphandler.New(svc)
+	// http.Handle("/metadata", http.HandlerFunc(h.GetMetadata))
+	// if err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil); err != nil {
+	// 	panic(err)
+	// }
+
+	h := grpchandler.New(svc)
+	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%v", port))
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+	server := grpc.NewServer()
+	reflection.Register(server)
+	gen.RegisterMetadataServiceServer(server, h)
+	if err := server.Serve(lis); err != nil {
 		panic(err)
 	}
 }
