@@ -15,6 +15,7 @@ import (
 	"movieexamplekhubaib.com/pkg/discovery/consul"
 	"movieexamplekhubaib.com/rating/internal/controller/rating"
 	grpchandler "movieexamplekhubaib.com/rating/internal/handler/grpc"
+	"movieexamplekhubaib.com/rating/internal/ingester/kafka"
 	"movieexamplekhubaib.com/rating/internal/repository/memory"
 )
 
@@ -67,7 +68,11 @@ func main() {
 	// }
 
 	repo := memory.New()
-	svc := rating.New(repo)
+	ingester, err := kafka.NewIngester("localhost", "rating", "ratings")
+	if err != nil {
+		log.Fatalf("failed to initialize ingester: %v", err)
+	}
+	svc := rating.New(repo, ingester)
 	h := grpchandler.New(svc)
 	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%v", port))
 	if err != nil {
