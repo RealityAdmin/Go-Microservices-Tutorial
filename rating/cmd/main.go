@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 
 	"movieexamplekhubaib.com/gen"
 	"movieexamplekhubaib.com/pkg/discovery"
@@ -16,7 +17,7 @@ import (
 	"movieexamplekhubaib.com/rating/internal/controller/rating"
 	grpchandler "movieexamplekhubaib.com/rating/internal/handler/grpc"
 	"movieexamplekhubaib.com/rating/internal/ingester/kafka"
-	"movieexamplekhubaib.com/rating/internal/repository/memory"
+	"movieexamplekhubaib.com/rating/internal/repository/mysql"
 )
 
 const serviceName = "rating"
@@ -67,7 +68,10 @@ func main() {
 	// 	panic(err)
 	// }
 
-	repo := memory.New()
+	repo, err := mysql.New()
+	if err != nil {
+		panic(err)
+	}
 	ingester, err := kafka.NewIngester("localhost", "rating", "ratings")
 	if err != nil {
 		log.Fatalf("failed to initialize ingester: %v", err)
@@ -79,7 +83,10 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	srv := grpc.NewServer()
+	reflection.Register(srv)
 	gen.RegisterRatingServiceServer(srv, h)
 	srv.Serve(lis)
 
 }
+
+// sudo docker run --name movieexample_db -e MYSQL_ROOT_PASSWORD=password -e MYSQL_DATABASE=movieexample -p 3306:3306 -d mysql:latest

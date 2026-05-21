@@ -3,10 +3,13 @@ module movieexamplekhubaib.com
 go 1.26
 
 require (
+	github.com/go-sql-driver/mysql v1.10.0
 	github.com/hashicorp/consul/api v1.34.2
 	google.golang.org/grpc v1.81.0
 	google.golang.org/protobuf v1.36.11
 )
+
+require filippo.io/edwards25519 v1.2.0 // indirect
 
 require (
 	github.com/armon/go-metrics v0.4.1 // indirect
