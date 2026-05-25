@@ -2,12 +2,13 @@ package main
 
 import (
 	"context"
-	"flag"
 	"fmt"
 	"log"
 	"net"
+	"os"
 	"time"
 
+	"gopkg.in/yaml.v3"
 	"movieexamplekhubaib.com/gen"
 	"movieexamplekhubaib.com/metadata/internal/controller/metadata"
 	"movieexamplekhubaib.com/metadata/internal/repository/memory"
@@ -23,18 +24,33 @@ const serviceName = "metadata"
 
 func main() {
 
-	var port int
-	flag.IntVar(&port, "port", 8081, "API handler port")
-	flag.Parse()
-	log.Printf("Starting metadata service on port %d", port)
+	// var port int
+	// flag.IntVar(&port, "port", 8081, "API handler port")
+	// flag.Parse()
+	// log.Printf("Starting metadata service on port %d", port)
+
+	f, err := os.Open("base.yaml")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+	var cfg serviceConfig
+	if err := yaml.NewDecoder(f).Decode(&cfg); err != nil {
+		panic(err)
+	}
+
 	registry, err := consul.NewRegistry("localhost:8500")
 	if err != nil {
 		panic(err)
 	}
 
+	port := cfg.APIConfig.Port
+
+	log.Printf("Starting movie metadata service on port %v", port)
+
 	ctx := context.Background()
 	instanceID := discovery.GenerateInstanceID(serviceName)
-	if err := registry.Register(ctx, instanceID, serviceName, fmt.Sprintf("localhost:%d", port)); err != nil {
+	if err := registry.Register(ctx, instanceID, serviceName, fmt.Sprintf("localhost:%v", cfg.APIConfig.Port)); err != nil {
 		panic(err)
 	}
 
@@ -60,7 +76,7 @@ func main() {
 	// }
 
 	h := grpchandler.New(svc)
-	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%v", port))
+	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%v", cfg.APIConfig.Port))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
